@@ -1,10 +1,10 @@
 // Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2019.1 (lin64) Build 2552052 Fri May 24 14:47:09 MDT 2019
-// Date        : Fri May  6 08:12:16 2022
+// Date        : Tue May 10 07:36:14 2022
 // Host        : pc-140-151-2 running 64-bit Ubuntu 20.04.4 LTS
 // Command     : write_verilog -force -mode synth_stub
-//               /home/alexander.kohn/xaui_0_ex/project_1_testxaui/project_1_testxaui.srcs/sources_1/ip/ten_gig_eth_mac_0/ten_gig_eth_mac_0_stub.v
+//               /home/alexander.kohn/MYREPO2/axi_mac_xaui_GTP_synth/axi_mac_xaui_GTP_synth.srcs/sources_1/ip/ten_gig_eth_mac_0/ten_gig_eth_mac_0_stub.v
 // Design      : ten_gig_eth_mac_0
 // Purpose     : Stub declaration of top-level module interface
 // Device      : xc7a200tifbv676-1L

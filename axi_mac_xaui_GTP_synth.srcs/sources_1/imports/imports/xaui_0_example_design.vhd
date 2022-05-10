@@ -65,9 +65,16 @@ PORT (
 	probe5 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
 	probe6 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
 	probe7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-		probe8 : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-				probe9 : IN STD_LOGIC_VECTOR(63 DOWNTO 0)
-
+    probe8 : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    probe9 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+    probe10 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+    probe11 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+    probe12 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    probe13 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+	probe14 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	probe15 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	probe16 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+	probe17 : IN STD_LOGIC_VECTOR(0 DOWNTO 0)
 
 	
 	
@@ -476,6 +483,17 @@ signal dclk_counter : unsigned (7 downto 0) := (others =>  '0');
   SIGNAL counter_idle : unsigned(30 DOWNTO 0) := (others => '0'); -- counting idle frames
   SIGNAL enable_frame_send : unsigned (0 downto 0):= "1"; -- 
 signal reset_cnt : unsigned (10 downto 0) := (others => '0'); -- should count reset;
+signal gt3_txresetdone_out : std_logic;
+signal gt2_txresetdone_out : std_logic;
+signal gt1_txresetdone_out : std_logic;
+signal gt0_txresetdone_out : std_logic;
+
+signal gt3_txresetdone_out_ila : std_logic_vector (0 downto 0);
+signal gt2_txresetdone_out_ila : std_logic_vector (0 downto 0);
+signal gt1_txresetdone_out_ila : std_logic_vector (0 downto 0);
+signal gt0_txresetdone_out_ila : std_logic_vector (0 downto 0);
+
+signal gt_tx_resetdone_out_ila : std_logic_vector( 3 downto 0);
 --
   attribute SHREG_EXTRACT : string;
 
@@ -525,13 +543,25 @@ signal clk_wiz_50Hz_o : std_logic;
     signal tx_axis_fifo_tlast           : std_logic;
     signal tx_axis_fifo_ready           : std_logic;
     signal aresetn : std_logic := '0';
+    signal reset_ila : std_logic_vector ( 0 downto 0);
+        signal aresetn_ila : std_logic_vector ( 0 downto 0);
+        signal mac_status_vector_ila: std_logic_vector ( 2 downto 0);
+
 -----------------------------
 
 begin
 
 clk156_locked_ila (0) <= clk156_lock;
+gt3_txresetdone_out_ila(0) <= gt3_txresetdone_out;
+gt2_txresetdone_out_ila(0) <= gt2_txresetdone_out;
+gt1_txresetdone_out_ila(0) <= gt1_txresetdone_out;
+gt0_txresetdone_out_ila(0) <= gt0_txresetdone_out;
+
 
 aresetn<=not(reset);
+reset_ila (0)<= reset;
+aresetn_ila (0)<= aresetn;
+
 ilacore2 : ila_1
 PORT MAP (
 	clk => clk_111m111,
@@ -545,7 +575,17 @@ PORT MAP (
 	probe6 => std_logic_vector(enable_frame_send),
 	probe7 => std_logic_vector(enable_send_idle),
 	probe8 => std_logic_vector(clk156_counter),
-	probe9 => xgmii_rxd_int
+	probe9 => xgmii_rxd_int,
+	probe10 =>reset_ila,
+	probe11 => aresetn_ila, 
+	probe12  => gt3_txresetdone_out_ila,-- 
+	probe13 => mac_status_vector_ila,
+    probe14  => gt2_txresetdone_out_ila,-- 
+	probe15  => gt1_txresetdone_out_ila,-- 
+	probe16  => gt0_txresetdone_out_ila,-- 
+    probe17 => ila_idle
+
+
 	-- add some status vector..
 );
  -----------------------------------------------------------------------------
@@ -596,7 +636,7 @@ mac1 : ten_gig_eth_mac_0
     pause_req => '0',
     tx_configuration_vector => X"0605040302da00000122",-- bit 8 = 1 
     rx_configuration_vector => X"0605040302da00000022",
-    status_vector => open,
+    status_vector => mac_status_vector_ila,
     tx_dcm_locked => '1',
     
     xgmii_txd => xgmii_txd_i, --- goes to xaui input
@@ -671,7 +711,7 @@ mac1 : ten_gig_eth_mac_0
    -- TX Reset and Initialisation
        gt0_txpmareset_in        => '0',
        gt0_txpcsreset_in        => '0',
-       gt0_txresetdone_out      => open,
+       gt0_txresetdone_out      => gt0_txresetdone_out,
    -- RX Reset and Initialisation
        gt0_rxpmareset_in        => '0',
        gt0_rxpcsreset_in        => '0',
@@ -731,7 +771,7 @@ mac1 : ten_gig_eth_mac_0
    -- TX Reset and Initialisation
        gt1_txpmareset_in        => '0',
        gt1_txpcsreset_in        => '0',
-       gt1_txresetdone_out      => open,
+       gt1_txresetdone_out      => gt1_txresetdone_out,
    -- RX Reset and Initialisation
        gt1_rxpmareset_in        => '0',
        gt1_rxpcsreset_in        => '0',
@@ -790,7 +830,7 @@ mac1 : ten_gig_eth_mac_0
    -- TX Reset and Initialisation
        gt2_txpmareset_in        => '0',
        gt2_txpcsreset_in        => '0',
-       gt2_txresetdone_out      => open,
+       gt2_txresetdone_out      => gt2_txresetdone_out,
    -- RX Reset and Initialisation
        gt2_rxpmareset_in        => '0',
        gt2_rxpcsreset_in        => '0',
@@ -849,7 +889,7 @@ mac1 : ten_gig_eth_mac_0
    -- TX Reset and Initialisation
        gt3_txpmareset_in        => '0',
        gt3_txpcsreset_in        => '0',
-       gt3_txresetdone_out      => open,
+       gt3_txresetdone_out      => gt3_txresetdone_out,
    -- RX Reset and Initialisation
        gt3_rxpmareset_in        => '0',
        gt3_rxpcsreset_in        => '0',
